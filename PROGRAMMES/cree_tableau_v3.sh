@@ -43,13 +43,40 @@ do
 
       #téléchargement (aspiration) de l'url en cours
       codeHTTP=$(curl -L -w '%{http_code}\n' -o $NOM_PAGES_ASPIREE $url);
+
+      echo "codeHTTP:"$codeHTTP
       if [[ $codeHTTP == 200 ]]
 			then 
+            #détection de l'encodage
+            
+            encodage=$(curl -L -I $url | egrep charset | cut -d"=" -f2 | tr -d '\r' | tr '[a-z]' '[A-Z]');
+
+            #echo $encodage | hex
+
+            echo "****************************************************"
+
+            echo "DD"$encodage"FF";
+
+            if [[ $encodage == "UTF-8" ]]
+               then
+                  echo "OK";
+
+               else
+      
+                  echo "KO: $NOM_PAGES_ASPIREE";
+
+               fi
+
+            echo "****************************************************"
+
+
+
             # construire les lignes du tableau
             echo "<tr>
                      <td align=\"center\" width=\"50\">$count_url</td>
                      <td align=\"center\" width=\"100\"><a href=\"$url\">$url</a></td>
                      <td><a href=\"$NOM_PAGES_ASPIREE\">PAGE ASPIREE</a></td>
+                     <td>"$encodage"</a></td>
                   </tr> " >>$TABLEAU_HTML
          else
             echo "<tr>
