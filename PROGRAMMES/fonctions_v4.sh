@@ -3,7 +3,8 @@ function detection_encodage(){
 
     if [[ $encodage == "" ]]
     then
-        encodage=$(cat $NOM_PAGES_ASPIREE | tr '/>' '\n'| egrep -m 1 'charset=' | cut -d"=" -f2 | tr -d '\r"' | tr '[a-z]' '[A-Z]')
+        encodage=$(egrep -oi "<meta[^>]*charset ?= ?\"?[^\" ,]+\"?" $NOM_PAGES_ASPIREE | egrep -oi -m 1 "charset.+" | cut -f2 -d= | tr -d '\r"' | tr '[a-z]' '[A-Z]')
+        #encodage=$(cat $NOM_PAGES_ASPIREE | tr '/>' '\n'| egrep -m 1 'charset=' | cut -d"=" -f2 | tr -d '\r"' | tr '[a-z]' '[A-Z]')
     fi
     
     echo "encodage="$encodage
@@ -17,9 +18,6 @@ function detection_encodage(){
 function gestion_encodage(){
 
             #echo $encodage | hex
-
-            
-            
 
             if [[ $encodage == "UTF-8" ]]
                then
@@ -41,7 +39,7 @@ function gestion_encodage(){
 function html_table_rows(){
 
     
-    rows="
+    echo "
         <tr>
             <td align=\"center\">$count_url</td>
             <td><a href=\"$url\">lien n°$count_url</a></td>
@@ -50,27 +48,27 @@ function html_table_rows(){
 
     if [[ $NOM_PAGES_ASPIREE != "" ]]
     then 
-        rows=$rows"
+        echo "
             <td><a href=\"$NOM_PAGES_ASPIREE\">PA°$count_fichier_urls"_"$count_url</a></td>";
     else
-        rows=$rows"
+        echo "
             <td>---</td>";
     fi
     
     
     if [[ $encodage != "" ]]
     then 
-        rows=$rows"
+        echo "
             <td>$encodage</td>";
     else
-        rows=$rows"
+        echo "
             <td>---</td>";
     fi
-    rows=$rows"    
+    echo "    
          </tr> ";
 
 
-    echo $rows
+    
 }
 
 
@@ -109,14 +107,14 @@ function html_body_close(){
 function html_table(){
     
     echo "
-    <table align=\"center\" border=\"1px\" bordercolor=blue>
+    <table align=\"center\" border=\"5px\" bordercolor=blue>
     
         <tr>
-            <th colspan=\"2\" align=\"center\" bgcolor=\"black\">
-                <font color=\"white\"><b>Tableau n° $count_fichier_urls ( $fichier_urls )</b></font>
+            <th colspan=\"11\" align=\"center\" bgcolor=\"blue\">
+                <font color=\"white\"><b>Tableau n° $count_fichier_urls</b> <span>(Fichier: $fichier_urls )</span></font>
             </th>
         </tr>
-        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th></tr>
+        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP</th></tr>
         "
 }
 
