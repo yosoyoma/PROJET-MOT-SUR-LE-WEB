@@ -1,13 +1,99 @@
+#!/bin/bash
+
+COLUMNS=90
+
+
+
+function logInfo(){
+	DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
+	MSG="[ $DATE_LOG ] $@"
+    echo "$MSG" 
+}
+
+function logSeparateur(){
+        SEPARATEUR=$@
+        for((idx=0;idx<120;idx++))
+        do
+                echo -ne "$SEPARATEUR"
+        done
+        echo "$SEPARATEUR" 
+}
+
+function startInfo(){
+        logSeparateur
+        logInfo "Demarrage $(basename $0)"
+        usage
+        logSeparateur
+}
+
+function endInfo(){
+        logSeparateur
+		exit 0
+}
+
+function toLog(){
+        DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
+        MSG="[ $DATE_LOG ] $@ ..."
+        echo -e "$MSG" 
+        MSG_LENGTH=${#MSG}
+}
+
+
+
+function log_success(){
+		
+        DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
+        MSG="[ $DATE_LOG ] $@ ..."
+		MSG_LENGTH=${#MSG}
+		echo -ne $MSG 
+        for((idx=$MSG_LENGTH;idx<90;idx++))
+        do
+                echo -ne " " 
+        done
+
+        echo -ne "\e[92m[ OK ]\e[0m" 
+	echo
+}
+
+# function restore(){
+	# TMP=$ETAPE
+	# unset ETAPE
+	# if [ "$TMP" != "" ]; then
+		# echo "!!ERREUR!!"|tee -a $FILE_LOG
+		# echo "!!BACKUP!!"|tee -a $FILE_LOG 
+	        # if [ ${TMP} -eq 1 ]; then
+                        # #command xxxxxx todo
+                # fi
+	# fi
+# }
+
+function log_failure(){
+        DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
+        MSG="[ $DATE_LOG ] $@ ..."
+		MSG_LENGTH=${#MSG}
+		echo -ne $MSG 
+        for((idx=$MSG_LENGTH;idx<90;idx++))
+        do
+                echo -ne " "
+        done
+
+        echo -ne "\e[91m[ KO ]\e[0m" 
+	echo
+
+	#logSeparateur
+    #exit 3
+}
+
 function detection_encodage(){
-    encodage=$(curl -sIL $url | egrep charset | cut -d"=" -f2 | tr -d '\r' | tr '[a-z]' '[A-Z]');
+    encodage=$(curl -sIL $url | egrep charset | cut -d"=" -f2 | tr -d '\r' | tr '[a-z]' '[A-Z]' | tail -n1);
 
     if [[ $encodage == "" ]]
     then
-        encodage=$(egrep -oi "<meta[^>]*charset ?= ?\"?[^\" ,]+\"?" $NOM_PAGES_ASPIREE | egrep -oi -m 1 "charset.+" | cut -f2 -d= | tr -d '\r"' | tr '[a-z]' '[A-Z]')
+        encodage=$(egrep -oi -m 1 "<meta[^>]*charset ?= ?\"?[^\" ,]+\"?" $NOM_PAGES_ASPIREE | egrep -oi -m 1 "charset.+" | cut -f2 -d= | tr -d '\r"' | tr '[a-z]' '[A-Z]')
         #encodage=$(cat $NOM_PAGES_ASPIREE | tr '/>' '\n'| egrep -m 1 'charset=' | cut -d"=" -f2 | tr -d '\r"' | tr '[a-z]' '[A-Z]')
     fi
     
-    echo "encodage="$encodage
+    log_success "Détection de l'encodage : charset=$encodage"
 
 
 
@@ -22,11 +108,11 @@ function gestion_encodage(){
             if [[ $encodage == "UTF-8" ]]
                then
                     is_utf8=1;
-                    echo "HTTP OK UTF8----------------------------------"
+                    logInfo "HTTP OK UTF8----------------------------------"
                   
                 else
                     is_utf8=0;
-                    echo "HTTP OK mais pas UTF8----------------------------------"
+                    logInfo "HTTP OK mais pas UTF8----------------------------------"
 
 
 
@@ -41,28 +127,28 @@ function html_table_rows(){
     
     echo "
         <tr>
-            <td align=\"center\">$count_url</td>
-            <td><a href=\"$url\">lien n°$count_url</a></td>
+            <td align=\"center\">$cptUrl</td>
+            <td align=\"center\"><a href=\"$url\">lien n°$cptUrl</a></td>
             <td align=\"center\">$codeHTTP</td>"
             
 
     if [[ $NOM_PAGES_ASPIREE != "" ]]
     then 
         echo "
-            <td><a href=\"$NOM_PAGES_ASPIREE\">PA°$count_fichier_urls"_"$count_url</a></td>";
+            <td align=\"center\"><a href=\"$NOM_PAGES_ASPIREE\">$cptTableau"_"$cptUrl</a></td>";
     else
         echo "
-            <td>---</td>";
+            <td align=\"center\">---</td>";
     fi
     
     
     if [[ $encodage != "" ]]
     then 
         echo "
-            <td>$encodage</td>";
+            <td align=\"center\">$encodage</td>";
     else
         echo "
-            <td>---</td>";
+            <td align=\"center\">---</td>";
     fi
     echo "    
          </tr> ";
@@ -111,10 +197,11 @@ function html_table(){
     
         <tr>
             <th colspan=\"11\" align=\"center\" bgcolor=\"blue\">
-                <font color=\"white\"><b>Tableau n° $count_fichier_urls</b> <span>(Fichier: $fichier_urls )</span></font>
+                <font color=\"white\"><b>Tableau n° $cptTableau</b> <span>(Fichier: $fichier )</span></font>
             </th>
         </tr>
-        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP</th></tr>
+        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP</th><th>DUMP-TEXT</th>
+        <th>Contexte</th><th>Nombre Motif</th><th>Bigramme</th></tr>
         "
 }
 
