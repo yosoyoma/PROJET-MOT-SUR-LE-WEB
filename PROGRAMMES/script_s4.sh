@@ -63,12 +63,12 @@ do
       encodage=""
 
       #vérification du code status http 
-      codeHTTP=$(curl -sIL -m 5 -w '%{http_code}\n' -o http_head $url | tr -d '\r\n');
+      codeHTTP=$(curl -sIL -m 15 -w '%{http_code}\n' -o http_head $url | tr -d '\r\n');
 
       
       if [[ $codeHTTP == 200 ]]
 			then 
-            log_success "HTTP CODE $codeHTTP"
+            log_success "Contrôle URL (HTTP CODE $codeHTTP)"
             NOM_PAGES_ASPIREE=$REP_PAGES_ASPIREES/$cptTableau"_"$cptUrl.html
 
 
@@ -84,8 +84,10 @@ do
 				# sinon il faudra aussi les faire et probablement d'autres
             gestion_encodage;
 
+            #
+
          else
-            log_failure "HTTP CODE: $codeHTTP"
+            log_failure "Contrôle URL (HTTP CODE $codeHTTP)"
 
       fi
 
