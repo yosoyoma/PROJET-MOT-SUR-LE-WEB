@@ -42,8 +42,8 @@ REP_CT=../CONTEXTES
 #Vidange des répertoires
 rm $REP_PA/*.html >$REP_LOG/command.log 2>&1 && log_success "Purge: $REP_PA" || log_failure "Error:"`cat $REP_LOG/command.log`
 rm $REP_DT/*.txt >$REP_LOG/command.log 2>&1 && log_success "Purge: $REP_DT" || log_failure "Error:"`cat $REP_LOG/command.log`
-#rm $REP_CT/*.txt >$REP_LOG/command.log 2>&1 && log_success "Purge: $REP_CT" || log_failure "Error:"`cat $REP_LOG/command.log`
-
+rm $REP_CT/*.txt >$REP_LOG/command.log 2>&1 && log_success "Purge: $REP_CT" || log_failure "Error:"`cat $REP_LOG/command.log`
+#exit 0
 #-------------------------------------------------------
 # en-tête du fichier html
 html_head >$TABLEAU_HTML
