@@ -121,7 +121,7 @@ function gestion_encodage(){
 
     if [[ $CHECK_ENCODAGE == 0 ]]
     then
-        logInfo "-----Gestion d'encodage-----"
+        #logInfo "-----Gestion d'encodage-----"
         
         if [[ $(iconv -l | grep $ENCODAGE) == "" ]]
         then
@@ -140,7 +140,7 @@ function gestion_encodage(){
             #touche $REP_LOG/command.log
         fi
 
-        logInfo "----------------------------"
+        #logInfo "----------------------------"
     fi
 
     #logInfo $NOM_FIC_PA_UTF8
