@@ -8,6 +8,8 @@ error=0
 function check_error(){
     echo $(cat $REP_LOG/command.log | wc -l)
 
+    touch $REP_LOG/command.log
+
     #echo $error
 }
 
@@ -119,7 +121,7 @@ function gestion_encodage(){
 
     if [[ $CHECK_ENCODAGE == 0 ]]
     then
-        #logInfo "-----Gestion d'encodage-----"
+        logInfo "-----Gestion d'encodage-----"
         
         if [[ $(iconv -l | grep $ENCODAGE) == "" ]]
         then
@@ -128,14 +130,17 @@ function gestion_encodage(){
             NOM_FIC_PA_UTF8=$(echo $NOM_FIC_PA | sed "s/.html/_UTF8.html/g") 
             CHECK_ENCODAGE=1
 
-            iconv --from $ENCODAGE --to 0UTF-8//TRANSLIT $NOM_FIC_PA  > $NOM_FIC_PA_UTF8 2>$REP_LOG/command.log\
-                                && log_success "conversion UTF-8" || log_failure "conversion UTF-8";
+            #echo "NOM_FIC_PA=$NOM_FIC_PA"
+            #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
+
+            iconv --from $ENCODAGE --to UTF-8 $NOM_FIC_PA >$NOM_FIC_PA_UTF8 2>$REP_LOG/command.log\
+                                && log_success "conversion UTF-8" || log_failure "conversion UTF-8"`cat $REP_LOG/command.log`;
 
             [[ $(check_error) == 0 ]] || CHECK_ENCODAGE=-1
-            
+            #touche $REP_LOG/command.log
         fi
 
-        #logInfo "----------------------------"
+        logInfo "----------------------------"
     fi
 
     #logInfo $NOM_FIC_PA_UTF8
@@ -152,11 +157,16 @@ function dump_text(){
 
         NOM_FIC_DT=$REP_DT"/utf8_"$CPT_TABLE"_"$CPT_URL.txt
 
+        #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
+
+
         #dumper le contenu de la page aspirée
-        lynx -dump -nolist -assume_charset="UTF-8" -display_charset="UTF-8" $NOM_FIC_PA_UTF8 > $NOM_FIC_DT 2>$REP_LOG/command.log\
-        && log_success "dumper le contenu de la page" || log_failure "Error:"`cat $REP_LOG/command.log`;
+        lynx -dump -nolist -assume_charset="$ENCODAGE" -display_charset="UTF-8" $NOM_FIC_PA > $NOM_FIC_DT 2>$REP_LOG/command.log \
+        && log_success "dumper le contenu de la page" || log_failure "lynx Error:"`cat $REP_LOG/command.log`;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_DT=""
+
+        #touche $REP_LOG/command.log
         
         #logInfo "----------------------------"
     fi
@@ -176,10 +186,10 @@ function extraire_contextes(){
 				# 2 méthodes : egrep + mingrep
 				# 1. construire des morceaux de corpus
 		egrep -C 2 -i "$MOTIFS" $NOM_FIC_DT > $NOM_FIC_CT 2>$REP_LOG/command.log \
-        && log_success "Extraction contextes" || log_failure "Error:"`cat $REP_LOG/command.log`;
+        && log_success "Extraction contextes" || log_failure "Extraction contextes Error:"`cat $REP_LOG/command.log`;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_CT=""
-        
+        #touche $REP_LOG/command.log
         #logInfo "----------------------------"
     fi
 }
@@ -192,9 +202,55 @@ function comptage_motifs(){
 
 
         [[ $(check_error) == 0 ]] && log_success "Compteur motifs" || log_failure "Compteur motifs Error:"`cat $REP_LOG/command.log` ;
+
+
+        #touche $REP_LOG/command.log
+    fi
+}
+
+
+
+function calcul_index(){
+
+    if [[ $NOM_FIC_DT != "" ]]
+    then
+		
+        NOM_FIC_FW=$REP_DT"/index_"$CPT_TABLE"_"$CPT_URL.txt
+        # 4ème traitement : index hiérarchique de chaque DUMP (commande déjà vue en cours)
+		
+        #egrep -i -o "\w+" $NOM_FIC_DT | sort | uniq -c  | sort -r -n -s -k 1,1 > $NOM_FIC_FW 2>$REP_LOG/command.log \
+         #       && log_success "Calcul index" || log_failure "Calcul index Error:"`cat $REP_LOG/command.log`
+
+        python3 micro_nlp_utils.py 	-i $NOM_FIC_DT --get=index >$NOM_FIC_FW 2>$REP_LOG/command.log \
+                    && log_success "Calcul index" || log_failure "Calcul index:"`cat $REP_LOG/command.log` ;
+
+        [[ $(check_error) == 0 ]] || NOM_FIC_FW=""
         
     fi
 }
+
+
+function calcul_bigramme(){
+
+
+
+    if [[ $NOM_FIC_DT != "" ]]
+    then
+		
+        NOM_FIC_BG=$REP_DT"/bigramme_"$CPT_TABLE"_"$CPT_URL.txt
+        # 4ème traitement : index hiérarchique de chaque DUMP (commande déjà vue en cours)
+		
+        #egrep -i -o "\w+" $NOM_FIC_DT | sort | uniq -c  | sort -r -n -s -k 1,1 > $NOM_FIC_FW 2>$REP_LOG/command.log \
+         #       && log_success "Calcul index" || log_failure "Calcul index Error:"`cat $REP_LOG/command.log`
+
+        python3 micro_nlp_utils.py 	-i $NOM_FIC_DT --get=bigrams >$NOM_FIC_BG 2>$REP_LOG/command.log \
+                    && log_success "Calcul bigramme" || log_failure "Calcul bigramme:"`cat $REP_LOG/command.log` ;
+
+        [[ $(check_error) == 0 ]] || NOM_FIC_BG=""
+        
+    fi
+}
+
 
 
 function telechargement_page(){
@@ -322,11 +378,11 @@ function html_table(){
     
         <tr>
             <th colspan=\"11\" align=\"center\" bgcolor=\"blue\">
-                <font color=\"white\"><b>Tableau n° $CPT_TABLE</b> <span>(Fichier: $fichier )</span></font>
+                <font color=\"white\"><b>Tableau n° $CPT_TABLE</b> <span>(Fichier: $FICHIER )</span></font>
             </th>
         </tr>
-        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP-TEXT</th>
-        <th>Contexte</th><th>Nombre<br>Motif</th><th>Freq.<br>des mots</th><th>Bigramme</th></tr>
+        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP-TEXT<br><span>(UTF-8)</span></th>
+        <th>Contexte</th><th>Nombre<br>Motif</th><th>Index</th><th>Bigramme</th></tr>
         "
 }
 

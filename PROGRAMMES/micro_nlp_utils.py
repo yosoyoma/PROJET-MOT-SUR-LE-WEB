@@ -55,10 +55,10 @@ def main(argv):
     if process=='index':
         #print('-----------------')
         for (f,w) in get_frequency(words):
-            print(f,w)
+            print('{0}\t{1}'.format(f,w))
     elif process=='bigrams':
         for (w1,w2) in make_bigrams(words):
-            print(w1,w2)
+            print('{0}\t{1}'.format(w1,w2))
 
 
 if __name__ == "__main__":

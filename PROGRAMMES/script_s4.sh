@@ -14,7 +14,7 @@ REP_URLS=$1
 TABLEAU_HTML=$2"index.html"
 
 
-MOTIFS="منع|حمل|피임|حبوب"
+MOTIFS="منع|حمل|피임|حبوب|politique"
 
 
 
@@ -104,7 +104,7 @@ do
 
             # si encodage = UTF8 alors on fait certains traitements
 				# sinon il faudra aussi les faire et probablement d'autres
-            #gestion_encodage;
+            gestion_encodage;
 
             #
             dump_text;
@@ -114,6 +114,13 @@ do
 
             #
             extraire_contextes;
+
+
+            #
+            calcul_index;
+
+            #
+            calcul_bigramme
 
       fi
 
