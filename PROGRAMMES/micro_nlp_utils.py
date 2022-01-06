@@ -8,8 +8,6 @@ def tokenize(text):
     okt=Okt()
     return okt.morphs(text.replace('\n',' '))
 
-
-
 def set_getops(argv):
     global input_file
     global process
@@ -59,7 +57,6 @@ def main(argv):
     elif process=='bigrams':
         for (w1,w2) in make_bigrams(words):
             print('{0}\t{1}'.format(w1,w2))
-
 
 if __name__ == "__main__":
     

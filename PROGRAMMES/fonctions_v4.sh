@@ -1,6 +1,6 @@
 #!/bin/bash
 
-COLUMNS=90
+COLUMNS=80
 
 REP_LOG=.
 error=0
@@ -21,11 +21,11 @@ function logInfo(){
 
 function logSeparateur(){
         SEPARATEUR=$@
-        for((idx=0;idx<150;idx++))
+        for((idx=0;idx<$COLUMNS;idx++))
         do
                 echo -ne "$SEPARATEUR"
         done
-        echo "$SEPARATEUR" 
+        echo "" 
 }
 
 function startInfo(){
@@ -54,8 +54,9 @@ function log_success(){
         DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
         MSG="[ $DATE_LOG ] $@ ..."
 		MSG_LENGTH=${#MSG}
+        MAX_LENGTH=$((  $COLUMNS - 7 ))
 		echo -ne $MSG 
-        for((idx=$MSG_LENGTH;idx<90;idx++))
+        for((idx=$MSG_LENGTH;idx<$MAX_LENGTH;idx++))
         do
                 echo -ne " " 
         done
@@ -69,8 +70,9 @@ function log_failure(){
         DATE_LOG=$(date "+%Y-%m-%d %H:%M:%S")
         MSG="[ $DATE_LOG ] $@ ..."
 		MSG_LENGTH=${#MSG}
+        MAX_LENGTH=$((  $COLUMNS - 7 ))
 		echo -ne $MSG 
-        for((idx=$MSG_LENGTH;idx<90;idx++))
+        for((idx=$MSG_LENGTH;idx<$MAX_LENGTH;idx++))
         do
                 echo -ne " "
         done
@@ -231,8 +233,6 @@ function calcul_index(){
 
 
 function calcul_bigramme(){
-
-
 
     if [[ $NOM_FIC_DT != "" ]]
     then
