@@ -99,13 +99,9 @@ function detection_encodage(){
             #encodage=$(cat $NOM_FIC_PA | tr '/>' '\n'| egrep -m 1 'charset=' | cut -d"=" -f2 | tr -d '\r"' | tr '[a-z]' '[A-Z]')
         fi
 
-        #encodage=""
+        #ENCODAGE=""
 
-        if [[ $ENCODAGE == "UTF-8" ]]
-        then
-            CHECK_ENCODAGE=1;
-            NOM_FIC_PA_UTF8=$NOM_FIC_PA;
-        fi
+        [[ $ENCODAGE == "UTF-8" ]] && CHECK_ENCODAGE=1
 
         if [[ $ENCODAGE != "" ]] 
         then
@@ -120,30 +116,40 @@ function detection_encodage(){
 function gestion_encodage(){
     #echo $encodage | hex
     #logInfo "check_encodage:$CHECK_ENCODAGE"
-
-    if [[ $CHECK_ENCODAGE == 0 ]]
+    if [[ $NOM_FIC_DT != "" ]]
     then
-        #logInfo "-----Gestion d'encodage-----"
-        
-        if [[ $(iconv -l | grep $ENCODAGE) == "" ]]
+
+        if [[ $CHECK_ENCODAGE == 0 ]]
         then
-            log_failure "L'encodage '$ENCODAGE' non supporté";
+            #logInfo "-----Gestion d'encodage-----"
+            
+            if [[ $(iconv -l | grep $ENCODAGE) == "" ]]
+            then
+                log_failure "L'encodage '$ENCODAGE' non supporté";
+            else
+                NOM_FIC_DT_UTF8=$(echo $NOM_FIC_DT | sed "s/.txt/_utf8.txt/g") 
+                CHECK_ENCODAGE=1
+
+                #echo "NOM_FIC_PA=$NOM_FIC_PA"
+                #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
+
+                iconv --from $ENCODAGE --to UTF-8 $NOM_FIC_DT >$NOM_FIC_DT_UTF8 2>$REP_LOG/command.log\
+                                    && log_success "conversion UTF-8" || log_failure "conversion UTF-8"`cat $REP_LOG/command.log`;
+
+                [[ $(check_error) == 0 ]] || CHECK_ENCODAGE=-1
+                #touche $REP_LOG/command.log
+            fi
         else
-            NOM_FIC_PA_UTF8=$(echo $NOM_FIC_PA | sed "s/.html/_UTF8.html/g") 
-            CHECK_ENCODAGE=1
+            NOM_FIC_DT_UTF8=$NOM_FIC_DT 
 
-            #echo "NOM_FIC_PA=$NOM_FIC_PA"
-            #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
-
-            iconv --from $ENCODAGE --to UTF-8 $NOM_FIC_PA >$NOM_FIC_PA_UTF8 2>$REP_LOG/command.log\
-                                && log_success "conversion UTF-8" || log_failure "conversion UTF-8"`cat $REP_LOG/command.log`;
-
-            [[ $(check_error) == 0 ]] || CHECK_ENCODAGE=-1
-            #touche $REP_LOG/command.log
+            #logInfo "----------------------------"
         fi
 
-        #logInfo "----------------------------"
+        
     fi
+
+    #NOM_FIC_DT_UTF8=""
+
 
     #logInfo $NOM_FIC_PA_UTF8
     #logInfo $NOM_FIC_PA
@@ -153,17 +159,17 @@ function gestion_encodage(){
 
 function dump_text(){
 
-    if [[ $CHECK_ENCODAGE == 1 ]] && [[ $NOM_FIC_PA_UTF8 != "" ]]
+    if [[ $ENCODAGE != "" ]] 
     then
         #logInfo "--------Dump to Text--------"
 
-        NOM_FIC_DT=$REP_DT"/utf8_"$CPT_TABLE"_"$CPT_URL.txt
+        NOM_FIC_DT=$REP_DT"/"$CPT_TABLE"_"$CPT_URL.txt
 
         #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
 
 
         #dumper le contenu de la page aspirée
-        lynx -dump -nolist -assume_charset="$ENCODAGE" -display_charset="UTF-8" $NOM_FIC_PA > $NOM_FIC_DT 2>$REP_LOG/command.log \
+        lynx -dump -nolist -assume_charset="$ENCODAGE" -display_charset="$ENCODAGE" $NOM_FIC_PA > $NOM_FIC_DT 2>$REP_LOG/command.log \
         && log_success "dumper le contenu de la page" || log_failure "lynx Error:"`cat $REP_LOG/command.log`;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_DT=""
@@ -172,12 +178,15 @@ function dump_text(){
         
         #logInfo "----------------------------"
     fi
+
+    #NOM_FIC_DT=""
+    
 }
 
 
 function extraire_contextes(){
 
-    if [[ $NOM_FIC_DT != "" ]]
+    if [[ $NOM_FIC_DT_UTF8 != "" ]]
     then
         #logInfo "--------Dump to Text--------"
 
@@ -187,7 +196,7 @@ function extraire_contextes(){
                     # 3ème traitement : extraire des contextes réduits au motif (1 ligne avant et 1 ligne après)
 				# 2 méthodes : egrep + mingrep
 				# 1. construire des morceaux de corpus
-		egrep -C 2 -i "$MOTIFS" $NOM_FIC_DT > $NOM_FIC_CT 2>$REP_LOG/command.log \
+		egrep -C 2 -i "$MOTIFS" $NOM_FIC_DT_UTF8 > $NOM_FIC_CT 2>$REP_LOG/command.log \
         && log_success "Extraction contextes" || log_failure "Extraction contextes Error:"`cat $REP_LOG/command.log`;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_CT=""
@@ -198,9 +207,9 @@ function extraire_contextes(){
 
 function comptage_motifs(){
 
-    if [[ $NOM_FIC_DT != "" ]]
+    if [[ $NOM_FIC_DT_UTF8 != "" ]]
     then
-		COMPTEUR_MOTIFS=$(egrep -o -i $MOTIFS $NOM_FIC_DT 2>$REP_LOG/command.log | wc -l);
+		COMPTEUR_MOTIFS=$(egrep -o -i $MOTIFS $NOM_FIC_DT_UTF8 2>$REP_LOG/command.log | wc -l);
 
 
         [[ $(check_error) == 0 ]] && log_success "Compteur motifs" || log_failure "Compteur motifs Error:"`cat $REP_LOG/command.log` ;
@@ -214,7 +223,7 @@ function comptage_motifs(){
 
 function calcul_index(){
 
-    if [[ $NOM_FIC_DT != "" ]]
+    if [[ $NOM_FIC_DT_UTF8 != "" ]]
     then
 		
         NOM_FIC_FW=$REP_DT"/index_"$CPT_TABLE"_"$CPT_URL.txt
@@ -223,7 +232,7 @@ function calcul_index(){
         #egrep -i -o "\w+" $NOM_FIC_DT | sort | uniq -c  | sort -r -n -s -k 1,1 > $NOM_FIC_FW 2>$REP_LOG/command.log \
          #       && log_success "Calcul index" || log_failure "Calcul index Error:"`cat $REP_LOG/command.log`
 
-        python3 micro_nlp_utils.py 	-i $NOM_FIC_DT --get=index >$NOM_FIC_FW 2>$REP_LOG/command.log \
+        python3 ./bin/micro_nlp_utils.py 	-i $NOM_FIC_DT_UTF8 --get=index >$NOM_FIC_FW 2>$REP_LOG/command.log \
                     && log_success "Calcul index" || log_failure "Calcul index:"`cat $REP_LOG/command.log` ;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_FW=""
@@ -234,7 +243,7 @@ function calcul_index(){
 
 function calcul_bigramme(){
 
-    if [[ $NOM_FIC_DT != "" ]]
+    if [[ $NOM_FIC_DT_UTF8 != "" ]]
     then
 		
         NOM_FIC_BG=$REP_DT"/bigramme_"$CPT_TABLE"_"$CPT_URL.txt
@@ -243,7 +252,7 @@ function calcul_bigramme(){
         #egrep -i -o "\w+" $NOM_FIC_DT | sort | uniq -c  | sort -r -n -s -k 1,1 > $NOM_FIC_FW 2>$REP_LOG/command.log \
          #       && log_success "Calcul index" || log_failure "Calcul index Error:"`cat $REP_LOG/command.log`
 
-        python3 micro_nlp_utils.py 	-i $NOM_FIC_DT --get=bigrams >$NOM_FIC_BG 2>$REP_LOG/command.log \
+        python3 ./bin/micro_nlp_utils.py 	-i $NOM_FIC_DT_UTF8 --get=bigrams >$NOM_FIC_BG 2>$REP_LOG/command.log \
                     && log_success "Calcul bigramme" || log_failure "Calcul bigramme:"`cat $REP_LOG/command.log` ;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_BG=""
@@ -261,133 +270,4 @@ function telechargement_page(){
             && log_success "Téléchargement de l'URL" || log_failure "Error:"`cat $REP_LOG/command.log` ;
 
     [[ $(check_error) == 0 ]] || NOM_FIC_PA=""
-}
-
-function html_table_rows(){
-  
-    echo "
-        <tr>
-            <td align=\"center\">$CPT_URL</td>
-            <td align=\"center\"><a href=\"$URL\">lien n°$CPT_URL</a></td>
-            <td align=\"center\">$codeHTTP</td>"
-            
-    if [[ $NOM_FIC_PA != "" ]]
-    then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_PA\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-    
-    if [[ $ENCODAGE != "" ]]
-    then 
-        echo "
-            <td align=\"center\">$ENCODAGE</td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-
-    if [[ $NOM_FIC_DT != "" ]]
-    then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_DT\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-
-    if [[ $NOM_FIC_CT != "" ]]
-    then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_CT\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-
-   if [[ $COMPTEUR_MOTIFS != "" ]]
-    then 
-        echo "
-            <td align=\"center\">$COMPTEUR_MOTIFS</td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-
-   if [[ $NOM_FIC_FW != "" ]]
-    then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_FW\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-
-   if [[ $NOM_FIC_BG != "" ]]
-    then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_BG\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "
-            <td align=\"center\">---</td>";
-    fi
-    echo "    
-         </tr> ";
-}
-
-
-function html_head(){
-    echo "
-<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
-<html>
-   <head>
-    <meta charset=\"utf-8\"/>
-      <title>tableaux de liens</title>
-      
-   </head>
-" 
-}
-
-function html_close(){
-    echo "
-</html>
-" 
-}
-
-
-
-function html_body(){
-    echo "
-   <body>
-    <p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>" 
-}
-
-function html_body_close(){
-    echo "
-   </body>
-   "
-
-}
-
-function html_table(){
-    
-    echo "
-    <table align=\"center\" border=\"5px\" bordercolor=blue>
-    
-        <tr>
-            <th colspan=\"11\" align=\"center\" bgcolor=\"blue\">
-                <font color=\"white\"><b>Tableau n° $CPT_TABLE</b> <span>(Fichier: $FICHIER )</span></font>
-            </th>
-        </tr>
-        <tr><th>N°</th><th>URL</th><th>CODE HTTP</th><th>PAGE ASPIREE</th><th>Encodage</th><th>DUMP-TEXT<br><span>(UTF-8)</span></th>
-        <th>Contexte</th><th>Nombre<br>Motif</th><th>Index</th><th>Bigramme</th></tr>
-        "
-}
-
-function html_table_close(){
-    echo "
-    </table>
-    <p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>"
 }
