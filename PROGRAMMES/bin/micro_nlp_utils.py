@@ -19,7 +19,7 @@ def set_getops(argv):
         opts, args = getopt.getopt(argv,"hi:g:",["in_file=","get="])
 
     except getopt.GetoptError:
-      print('script.py -i <inputfile> -g <frequecy/bigrams>')
+      print('script.py -i <inputfile> -g <index/bigrams>')
       sys.exit(2)
     
     for opt, arg in opts:
