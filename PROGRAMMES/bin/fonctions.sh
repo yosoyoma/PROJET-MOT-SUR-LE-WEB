@@ -5,6 +5,8 @@ COLUMNS=80
 REP_LOG=.
 error=0
 
+touch $REP_LOG/command.log
+
 function check_error(){
     echo $(cat $REP_LOG/command.log | wc -l)
 
