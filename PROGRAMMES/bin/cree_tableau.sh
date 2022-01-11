@@ -10,74 +10,58 @@ function html_table_rows(){
             
     if [[ $NOM_FIC_PA != "" ]]
     then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_PA\">$CPT_TABLE"_"$CPT_URL</a></td>";
+        echo "<td align=\"center\"><a href=\"$NOM_FIC_PA\">$CPT_TABLE"_"$CPT_URL</a></td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
     
     if [[ $ENCODAGE != "" ]]
     then 
-        echo "
-            <td align=\"center\">$ENCODAGE</td>";
+        echo "<td align=\"center\">$ENCODAGE</td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
 
     if [[ $NOM_FIC_DT_UTF8 != "" ]]
     then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_DT_UTF8\">$CPT_TABLE"_"$CPT_URL</a></td>";
+        echo "<td align=\"center\"><a href=\"$NOM_FIC_DT_UTF8\">$CPT_TABLE"_"$CPT_URL</a></td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
 
     if [[ $NOM_FIC_CT != "" ]]
     then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_CT\">$CPT_TABLE"_"$CPT_URL</a></td>";
+        echo "<td align=\"center\"><a href=\"$NOM_FIC_CT\">$CPT_TABLE"_"$CPT_URL</a></td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
 
    if [[ $COMPTEUR_MOTIFS != "" ]]
     then 
-        echo "
-            <td align=\"center\">$COMPTEUR_MOTIFS</td>";
+        echo "<td align=\"center\">$COMPTEUR_MOTIFS</td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
 
    if [[ $NOM_FIC_FW != "" ]]
     then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_FW\">$CPT_TABLE"_"$CPT_URL</a></td>";
+        echo "<td align=\"center\"><a href=\"$NOM_FIC_FW\">$CPT_TABLE"_"$CPT_URL</a></td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
 
    if [[ $NOM_FIC_BG != "" ]]
     then 
-        echo "
-            <td align=\"center\"><a href=\"$NOM_FIC_BG\">$CPT_TABLE"_"$CPT_URL</a></td>";
+        echo "<td align=\"center\"><a href=\"$NOM_FIC_BG\">$CPT_TABLE"_"$CPT_URL</a></td>";
     else
-        echo "
-            <td align=\"center\">---</td>";
+        echo "<td align=\"center\">---</td>";
     fi
-    echo "    
-         </tr> ";
+    echo "</tr> ";
 }
 
 
 function html_head(){
-    echo "
-    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
+    echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
     <html>
    <head>
     <meta charset=\"utf-8\"/>
@@ -130,30 +114,23 @@ function html_head(){
 }
 
 function html_close(){
-    echo "
-</html>
-" 
+    echo "</html>" 
 }
 
 
 
 function html_body(){
-    echo "
-   <body>
-    <p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>" 
+    echo "<body><p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>" 
 }
 
 function html_body_close(){
-    echo "
-   </body>
-   "
+    echo "</body>"
 
 }
 
 function html_table(){
     
-    echo "
-    <table align=\"center\" border=\"5px\" bordercolor=blue>
+    echo "<table align=\"center\" border=\"5px\" bordercolor=blue>
     
         <tr>
             <th colspan=\"11\" align=\"center\" bgcolor=\"blue\">
@@ -166,7 +143,6 @@ function html_table(){
 }
 
 function html_table_close(){
-    echo "
-    </table>
+    echo "</table>
     <p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>"
 }
