@@ -2,8 +2,7 @@
 
 function html_table_rows(){
   
-    echo "
-        <tr>
+    echo "<tr>
             <td align=\"center\">$CPT_URL</td>
             <td align=\"center\"><a href=\"$URL\">lien n°$CPT_URL</a></td>
             <td align=\"center\">$codeHTTP</td>"
