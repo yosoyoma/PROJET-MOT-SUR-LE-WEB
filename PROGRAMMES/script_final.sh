@@ -63,6 +63,9 @@ html_head >$TABLEAU_HTML
 html_body >>$TABLEAU_HTML
 #-------------------------------------------------------
 
+
+#x-www-browser $TABLEAU_HTML
+
 # pour chaque élément contenu dans DOSSIER_URL
 #compteur des fichiers des urls
 # on compte les tableaux
