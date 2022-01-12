@@ -65,6 +65,7 @@ function log_success(){
 
         echo -ne "\e[92m[ OK ]\e[0m" 
 	echo
+    error=0
 }
 
 
@@ -81,6 +82,7 @@ function log_failure(){
 
         echo -ne "\e[91m[ KO ]\e[0m" 
 	echo
+    error=1
 
 	#logSeparateur
     #exit 3
@@ -202,6 +204,8 @@ function extraire_contextes(){
         && log_success "Extraction contextes" || log_failure "Extraction contextes Error:"`cat $REP_LOG/command.log`;
 
         [[ $(check_error) == 0 ]] || NOM_FIC_CT=""
+        [[ $error == 0 ]] || NOM_FIC_CT=""
+        error=0
         #touche $REP_LOG/command.log
         #logInfo "----------------------------"
     fi
