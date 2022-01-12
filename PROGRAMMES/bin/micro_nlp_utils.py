@@ -33,7 +33,7 @@ def set_getops(argv):
 
 
 def read_file(file_path):
-    with open(file_path,'r',encoding="UTF-8") as file :
+    with open(file_path,'r',encoding="utf-8", errors='replace') as file :
         return file.read()
 
 def get_frequency(tokens, reverse=True):
