@@ -131,7 +131,8 @@ function gestion_encodage(){
             then
                 log_failure "L'encodage '$ENCODAGE' non supporté";
             else
-                NOM_FIC_DT_UTF8=$(echo $NOM_FIC_DT | sed "s/.txt/_utf8.txt/g") 
+                
+                NOM_FIC_DT_UTF8=$(echo $NOM_FIC_DT | sed "s|$REP_DT"/"|$REP_DT"/utf8_"|g") 
                 CHECK_ENCODAGE=1
 
                 #echo "NOM_FIC_PA=$NOM_FIC_PA"
@@ -170,6 +171,8 @@ function dump_text(){
         NOM_FIC_DT=$REP_DT"/"$CPT_TABLE"_"$CPT_URL.txt
 
         #echo "NOM_FIC_PA_UTF8=$NOM_FIC_PA_UTF8"
+
+        [[ $ENCODAGE == "UTF-8" ]] && NOM_FIC_DT=$REP_DT"/utf8_"$CPT_TABLE"_"$CPT_URL.txt
 
 
         #dumper le contenu de la page aspirée

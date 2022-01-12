@@ -48,7 +48,7 @@ fi
 
 if [ "$(ls -A $REP_DT)" ] 
 then 
-   rm $REP_DT/*.txt >$REP_LOG/command.log 2>&1 && log_success "Purge: $REP_DT" || log_failure "Error:"`cat $REP_LOG/command.log`
+   rm $REP_DT/*.txt 2>$REP_LOG/command.log && log_success "Purge: $REP_DT" || log_failure "Error:"`cat $REP_LOG/command.log`
 fi
 
 if [ "$(ls -A $REP_CT)" ] 
