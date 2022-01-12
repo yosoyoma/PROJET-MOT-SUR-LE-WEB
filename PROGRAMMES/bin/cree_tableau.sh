@@ -7,57 +7,22 @@ function html_table_rows(){
             <td align=\"center\"><a href=\"$URL\">lien n°$CPT_URL</a></td>
             <td align=\"center\">$codeHTTP</td>"
             
-    if [[ $NOM_FIC_PA != "" ]]
-    then 
-        echo "<td align=\"center\"><a href=\"$NOM_FIC_PA\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
+    [[ $NOM_FIC_PA != "" ]] && echo "<td align=\"center\"><a href=\"$NOM_FIC_PA\">$CPT_TABLE"_"$CPT_URL</a></td>"|| echo "<td align=\"center\">---</td>";
+        
+    [[ $ENCODAGE != "" ]] && echo "<td align=\"center\">$ENCODAGE</td>" || echo "<td align=\"center\">---</td>";
+
+    [[ $NOM_FIC_DT_UTF8 != "" ]] && echo "<td align=\"center\"><a href=\"$NOM_FIC_DT_UTF8\">$CPT_TABLE"_"$CPT_URL</a></td>" || echo "<td align=\"center\">---</td>";
     
-    if [[ $ENCODAGE != "" ]]
-    then 
-        echo "<td align=\"center\">$ENCODAGE</td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
-
-    if [[ $NOM_FIC_DT_UTF8 != "" ]]
-    then 
-        echo "<td align=\"center\"><a href=\"$NOM_FIC_DT_UTF8\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
-
-    if [[ $NOM_FIC_CT != "" ]]
-    then 
-        echo "<td align=\"center\"><a href=\"$NOM_FIC_CT\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
-
-   if [[ $COMPTEUR_MOTIFS != "" ]]
-    then 
-        echo "<td align=\"center\">$COMPTEUR_MOTIFS</td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
-
-   if [[ $NOM_FIC_FW != "" ]]
-    then 
-        echo "<td align=\"center\"><a href=\"$NOM_FIC_FW\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
-
-   if [[ $NOM_FIC_BG != "" ]]
-    then 
-        echo "<td align=\"center\"><a href=\"$NOM_FIC_BG\">$CPT_TABLE"_"$CPT_URL</a></td>";
-    else
-        echo "<td align=\"center\">---</td>";
-    fi
+    [[ $NOM_FIC_CT != "" ]] && echo "<td align=\"center\"><a href=\"$NOM_FIC_CT\">$CPT_TABLE"_"$CPT_URL</a></td>" || echo "<td align=\"center\">---</td>";
+    
+    [[ $COMPTEUR_MOTIFS != "" ]] && echo "<td align=\"center\">$COMPTEUR_MOTIFS</td>" || echo "<td align=\"center\">---</td>";
+    
+    [[ $NOM_FIC_FW != "" ]] && echo "<td align=\"center\"><a href=\"$NOM_FIC_FW\">$CPT_TABLE"_"$CPT_URL</a></td>" || echo "<td align=\"center\">---</td>";
+   
+    [[ $NOM_FIC_BG != "" ]] && echo "<td align=\"center\"><a href=\"$NOM_FIC_BG\">$CPT_TABLE"_"$CPT_URL</a></td>" || echo "<td align=\"center\">---</td>";
+    
     echo "</tr> ";
 }
-
 
 function html_head(){
     echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">
@@ -115,8 +80,6 @@ function html_head(){
 function html_close(){
     echo "</html>" 
 }
-
-
 
 function html_body(){
     echo "<body><p align=\"center\"><hr color=\"blue\" width=\"50%\"/></p>" 
